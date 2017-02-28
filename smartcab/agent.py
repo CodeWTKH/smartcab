@@ -36,7 +36,7 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-        self.epsilon -= 0.05
+        self.epsilon -= 0.02
         if testing:
             self.epsilon = 0
             self.alpha = 0
@@ -53,7 +53,7 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)  # Remaining deadline
 
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint, deadline)
+        state = (waypoint, inputs['left'], inputs['oncoming'])
 
         return state
 
@@ -64,7 +64,7 @@ class LearningAgent(Agent):
 
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = max(self.Q.get(state))
+        maxQ = max(self.Q[state].itervalues())
 
         return maxQ 
 
@@ -79,8 +79,8 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
         if not state in self.Q.keys():
-            actions = [{i: 0.0} for i in self.valid_actions]
-            self.Q[state] = actions
+            actions = [(i, 0.0) for i in self.valid_actions]
+            self.Q[state] = dict(actions)
 
         return
 
@@ -97,7 +97,7 @@ class LearningAgent(Agent):
         # When not learning, choose a random action
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
-        if(not self.learning):
+        if not self.learning:
             action = random.choice(self.valid_actions)
         elif random.random() <= self.epsilon:
             action = random.choice(self.valid_actions)
@@ -114,11 +114,9 @@ class LearningAgent(Agent):
             receives an award. This function does not consider future rewards 
             when conducting learning. """
 
-        ########### 
-        ## TO DO ##
-        ###########
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
+        self.Q[state][action] += self.alpha * reward
 
         return
 
@@ -170,7 +168,7 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.01, log_metrics=True)
+    sim = Simulator(env, update_delay=0.01, display=False, log_metrics=True)
     
     ##############
     # Run the simulator
