@@ -33,13 +33,13 @@ class LearningAgent(Agent):
         # Select the destination as the new location to route to
         self.planner.route_to(destination)
         
-        ########### 
-        ## TO DO ##
-        ###########
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-
+        self.epsilon -= 0.05
+        if testing:
+            self.epsilon = 0
+            self.alpha = 0
         return None
 
     def build_state(self):
@@ -52,11 +52,8 @@ class LearningAgent(Agent):
         inputs = self.env.sense(self)           # Visual input - intersection light and traffic
         deadline = self.env.get_deadline(self)  # Remaining deadline
 
-        ########### 
-        ## TO DO ##
-        ###########
         # Set 'state' as a tuple of relevant data for the agent        
-        state = (waypoint, inputs, deadline)
+        state = (waypoint, deadline)
 
         return state
 
@@ -65,12 +62,9 @@ class LearningAgent(Agent):
         """ The get_max_Q function is called when the agent is asked to find the
             maximum Q-value of all actions based on the 'state' the smartcab is in. """
 
-        ########### 
-        ## TO DO ##
-        ###########
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = None
+        maxQ = max(self.Q.get(state))
 
         return maxQ 
 
@@ -84,6 +78,9 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
+        if not state in self.Q.keys():
+            actions = [{i: 0.0} for i in self.valid_actions]
+            self.Q[state] = actions
 
         return
 
@@ -97,14 +94,18 @@ class LearningAgent(Agent):
         self.next_waypoint = self.planner.next_waypoint()
         action = None
 
-        ########### 
-        ## TO DO ##
-        ###########
         # When not learning, choose a random action
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
         if(not self.learning):
             action = random.choice(self.valid_actions)
+        elif random.random() <= self.epsilon:
+            action = random.choice(self.valid_actions)
+        else:
+            max = self.get_maxQ(state)
+            for k, v in self.Q.iteritems():
+               if v == max:
+                   action = k
         return action
 
 
@@ -154,7 +155,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent)
+    agent = env.create_agent(LearningAgent, learning=True)
     
     ##############
     # Follow the driving agent
