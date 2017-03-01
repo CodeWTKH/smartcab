@@ -63,7 +63,8 @@ class LearningAgent(Agent):
 
         # Calculate the maximum Q-value of all actions for a given state
         maxQ = max(self.Q[state].itervalues())
-        return maxQ 
+
+        return maxQ
 
 
     def createQ(self, state):
@@ -72,9 +73,8 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if not state in self.Q.keys():
-            actions = [(i, 0.0) for i in self.valid_actions]
-            self.Q[state] = dict(actions)
+        if self.learning and state not in self.Q.keys():
+            self.Q[state] = {action: 0.0 for action in self.valid_actions}
         return
 
 
@@ -93,9 +93,12 @@ class LearningAgent(Agent):
         if not self.learning or random.random() < self.epsilon:
             action = random.choice(self.valid_actions)
         else:
-            for k, v in self.Q[state].iteritems():
-                if v == self.get_maxQ(state):
-                    action = k
+            maxQ = self.get_maxQ(state)
+            v_actions = [a for a in self.Q[state].iterkeys() if self.Q[state][a] == maxQ]
+            actions = [None, 'right', 'forward', 'left']
+            for a in actions:
+                if a in v_actions:
+                    return a
         return action
 
 
@@ -106,7 +109,8 @@ class LearningAgent(Agent):
 
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
-        self.Q[state][action] = (1 - self.alpha) * self.Q[state][action] + self.alpha * (reward - self.Q[state][action])
+        if self.learning:
+            self.Q[state][action] += self.alpha * (reward - self.Q[state][action])
         return
 
 
@@ -164,7 +168,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.01, n_test=20)
+    sim.run(tolerance=0.015, n_test=20)
 
 
 if __name__ == '__main__':
