@@ -94,11 +94,8 @@ class LearningAgent(Agent):
             action = random.choice(self.valid_actions)
         else:
             maxQ = self.get_maxQ(state)
-            v_actions = [a for a in self.Q[state].iterkeys() if self.Q[state][a] == maxQ]
-            actions = [None, 'right', 'forward', 'left']
-            for a in actions:
-                if a in v_actions:
-                    return a
+            actions = [a for a in self.valid_actions if self.Q[state][a] == maxQ]
+            action = random.choice(actions)
         return action
 
 
@@ -115,7 +112,7 @@ class LearningAgent(Agent):
 
 
     def update(self):
-        """ The update function is called when a time step is completed in the 
+        """ The update function is called when a time step is completed in the
             environment for a given trial. This function will build the agent
             state, choose an action, receive a reward, and learn if enabled. """
 
@@ -168,7 +165,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.015, n_test=20)
+    sim.run(tolerance=0.012, n_test=20)
 
 
 if __name__ == '__main__':
