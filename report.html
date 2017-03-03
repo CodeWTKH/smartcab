@@ -11865,7 +11865,7 @@ div#notebook {
 <ul>
 <li>智能出租车完全没有移动；</li>
 <li>代理程序获得的奖励是一个数字，有时的正值有时是负值；</li>
-<li>交通灯在红灯的时候代理程序获得了正值的奖励；在绿灯时如果前方有左转的车则有获得少量正值的奖励，否则受到负值的奖励。</li>
+<li>交通灯在红灯的时候代理程序获得了大于2的正值奖励；在绿灯时如果前方有左转的车则有获得小于1的正值奖励，否则受到小于-4的负值奖励。</li>
 </ul>
 
 </div>
@@ -11905,7 +11905,7 @@ div#notebook {
 <ul>
 <li>display改变了Simulator对象，控制是否绘制GUI；enforce_deadline控制了一个判断语句，判断是否根据剩余步数来结束模拟；learning决定了agent中的一些方法在调用时的支路情况，如learn方法中是否更新Qtable。</li>
 <li>调用act()函数。</li>
-<li>render()绘制了GUI将小车现在的状态、是否违反交通规则和获得的奖励填在GUI上；render_text()不会绘制GUI，将epsilon、alpha和小车状态等信息打印到了控制台，由于render()方法调用了render_text()方法，所以render_text()方法总是会被调用。</li>
+<li>render()绘制了GUI将小车现在的状态、是否违反交通规则和获得的奖励填在GUI上；render_text()不会绘制GUI，将epsilon、alpha和小车状态等信息打印到了控制台。在display设为True时render()才会被调用，而render_text()总是被调用。</li>
 <li>优先考虑东西方向。</li>
 </ul>
 
